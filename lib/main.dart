@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:quran_app/controller/theme_controller.dart';
-import 'package:quran_app/view/page/home_page.dart';
+import 'package:quran_app/utilities/router.dart';
+import 'package:quran_app/utilities/routes.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -18,10 +25,15 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Quran App',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        ),
-        home: const HomePage(),
+        localizationsDelegates: [
+          GlobalCupertinoLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        locale: Locale('ar'),
+        supportedLocales: [Locale('ar'), Locale('en')],
+        onGenerateRoute: onGenerateRoute,
+        initialRoute: AppRoutes.homePage,
       ),
     );
   }

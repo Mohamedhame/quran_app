@@ -1,0 +1,17 @@
+// إضافة المشروع الي Github كالتالي
+اولا اوامر ال terminal
+git init
+git add .
+git commit -m "Initial commit"
+==> إنشاء مستودع جديد (Repository) على GitHub
+اختر اسم المستودع مثل my_flutter_app
+مره اخري في ال terminal
+git remote add origin https://github.com/username/my_flutter_app.git
+git branch -M main
+git push -u origin main
+===============
+لاضافة تعديل 
+git add .
+git commit -m "Some update"
+git push
+====================
