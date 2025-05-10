@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:quran_app/controller/theme_controller.dart';
 import 'package:quran_app/utilities/routes.dart';
 import 'package:quran_app/view/widgets/custom_button.dart';
-import 'package:quran_app/view/widgets/stylish_card.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -13,12 +12,13 @@ class HomePage extends StatelessWidget {
     final theme = Provider.of<ThemeController>(context);
     return Scaffold(
       backgroundColor: theme.primaryColor,
-      body: SafeArea(
-        child: SizedBox(
-          width: double.infinity,
+      body: Center(
+        child: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const SizedBox(height: 50),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Align(
@@ -34,7 +34,7 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
               ),
-
+              const SizedBox(height: 50),
               Expanded(
                 child: Column(
                   children: [

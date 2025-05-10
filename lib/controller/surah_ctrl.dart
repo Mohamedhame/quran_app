@@ -24,6 +24,7 @@ class SurahCtrl extends ChangeNotifier {
         "isExit": await FileStorage.checkExist(
           dir: shikhName,
           fileName: element['name'],
+          format: "mp3"
         ),
       });
     }

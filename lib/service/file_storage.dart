@@ -76,14 +76,26 @@ class FileStorage {
   static Future<bool> checkExist({
     required String dir,
     required String fileName,
+    required String format,
   }) async {
     String pathDirectory = await getPath(dir);
-    String pathFile = "$pathDirectory/$fileName.mp3";
+    String pathFile = "$pathDirectory/$fileName.$format";
     final File file = File(pathFile);
     if (await file.exists()) {
       return true;
     } else {
       return false;
     }
+  }
+
+  // returen path of file
+  static Future<String> urlFile({
+    required String dir,
+    required String fileName,
+    required String format,
+  }) async {
+    String pathDirectory = await getPath(dir);
+    String pathFile = "$pathDirectory/$fileName.$format";
+    return pathFile;
   }
 }

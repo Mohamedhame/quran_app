@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:quran_app/controller/list_of_quraa_ctrl.dart';
-import 'package:quran_app/controller/sira_ctrl.dart';
 import 'package:quran_app/utilities/routes.dart';
 import 'package:quran_app/view/page/home_page.dart';
 import 'package:quran_app/view/page/quran/list_of_quraa.dart';
@@ -33,10 +32,7 @@ Route<dynamic> onGenerateRoute(RouteSettings settings) {
     case AppRoutes.sira:
       return CupertinoPageRoute(
         builder:
-            (_) => ChangeNotifierProvider(
-              create: (context) => SiraCtrl(),
-              child: Sira(),
-            ),
+            (_) => Sira(),
         settings: settings,
       );
     default:
