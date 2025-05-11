@@ -27,7 +27,11 @@ class CustomButton extends StatelessWidget {
               child: Text(
                 textAlign: TextAlign.center,
                 textButton,
-                style: GoogleFonts.amiri(color: theme.fontColor),
+                style: GoogleFonts.amiri(
+                  color: theme.fontColor,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
