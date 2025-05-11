@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:quran_app/controller/list_of_quraa_ctrl.dart';
+import 'package:quran_app/controller/sound_play_ctrl.dart';
 import 'package:quran_app/controller/surah_ctrl.dart';
 import 'package:quran_app/controller/theme_controller.dart';
 import 'package:quran_app/view/page/quran/surah.dart';
@@ -15,6 +16,7 @@ class ListOfQuraa extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeController>(context);
     final model = Provider.of<ListOfQuraaCtrl>(context);
+    final audioCrtl = Provider.of<SoundPlayCtrl>(context);
     List data = model.filterQuraaOnSearch;
     return Scaffold(
       backgroundColor: theme.primaryColor,
@@ -42,7 +44,8 @@ class ListOfQuraa extends StatelessWidget {
                             (context) => ChangeNotifierProvider(
                               create:
                                   (context) =>
-                                      SurahCtrl(shikhName: shikhName, url: url),
+                                      SurahCtrl(shikhName: shikhName, url: url)
+                                        ..goToAudio(context, audioCrtl),
                               child: Surah(),
                             ),
                       ),

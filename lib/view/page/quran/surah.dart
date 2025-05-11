@@ -35,7 +35,7 @@ class Surah extends StatelessWidget {
                       dir: model.shikhName,
                     ),
 
-                    onTap: () {
+                    onTap: () async {
                       soundPlay.playAudio(
                         model.surahs,
                         index,

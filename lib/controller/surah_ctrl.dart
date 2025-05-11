@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:quran_app/controller/sound_play_ctrl.dart';
 import 'package:quran_app/service/file_storage.dart';
+import 'package:quran_app/service/shared.dart';
 import 'package:quran_app/service/web_scraping.dart';
+import 'package:quran_app/view/page/sound_play.dart';
 
 class SurahCtrl extends ChangeNotifier {
   SurahCtrl({required this.shikhName, required this.url}) {
@@ -24,11 +27,35 @@ class SurahCtrl extends ChangeNotifier {
         "isExit": await FileStorage.checkExist(
           dir: shikhName,
           fileName: element['name'],
-          format: "mp3"
+          format: "mp3",
         ),
       });
     }
     isLoading = false;
     notifyListeners();
+  }
+
+  void goToAudio(BuildContext context, SoundPlayCtrl audioCrtl) async {
+    Map? data = await Shared.getMusicQuran();
+    if (data!['shihkName'] == shikhName) {
+      audioCrtl.playAudio(
+        data['data'],
+        data['index'],
+        shihkName: data['shihkName'],
+        pos: data['position'].toDouble(),
+      );
+      audioCrtl.handlePlayPause();
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder:
+              (context) => SoundPlay(
+                isSerah: false,
+                sikhName: data['shihkName'],
+                data: data['data'],
+                index: data['index'],
+              ),
+        ),
+      );
+    }
   }
 }
