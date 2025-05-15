@@ -12,6 +12,6 @@ git push -u origin main
 ===============
 لاضافة تعديل 
 git add .
-git commit -m "Some update"
+git commit -m "6-May-2025 14:47"
 git push
 ====================

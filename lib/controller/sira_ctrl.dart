@@ -38,7 +38,7 @@ class SiraCtrl extends ChangeNotifier {
       audioCrtl.playAudio(
         data['data'],
         data['index'],
-        shihkName: data['shihkName'],
+        shikhName: data['shihkName'],
         pos: data['position'].toDouble(),
       );
       audioCrtl.handlePlayPause();

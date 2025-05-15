@@ -30,6 +30,7 @@ class SoundPlayCtrl extends ChangeNotifier {
 
   void changeRepeat() {
     isRepeat = !isRepeat;
+    playr.setLoopMode(isRepeat ? LoopMode.one : LoopMode.off);
     notifyListeners();
   }
 
@@ -46,93 +47,118 @@ class SoundPlayCtrl extends ChangeNotifier {
     }
   }
 
-  void handleSeek(double value) {
+  Future<void> handleSeek(double value) async {
     playr.seek(Duration(seconds: value.toInt()));
   }
 
-  Future<void> playAudio(
-    List data,
-    int index, {
-    String? shihkName,
-    double? pos,
-  }) async {
-    if (data.isEmpty) return;
-    isNoInternet = false;
-    currentIndex = index;
-    title = data[index]['name'];
-    externalData = data;
-    externalShihkName = shihkName;
+  Future<ConcatenatingAudioSource> initializePlaylist(
+    List myList,
+    String shikhName,
+  ) async {
+    List<AudioSource> audioSources = [];
 
-    String path;
-
-    try {
-      if (await FileStorage.checkExist(
-        dir: data[currentIndex]['name'],
-        fileName: shihkName!,
-        format: "mp3",
-      )) {
-        path = await FileStorage.urlFile(
-          dir: shihkName,
-          fileName: data[currentIndex]['name'],
+    for (int index = 0; index < myList.length; index++) {
+      String url;
+      if (await myList[index]['isExit']) {
+        url = await FileStorage.urlFile(
+          dir: shikhName,
+          fileName: myList[index]['name'],
           format: "mp3",
         );
       } else {
-        path = data[currentIndex]['url'];
-        isNoInternet = !(await checkInternet());
+        url = myList[index]['url'];
       }
 
-      await playr.setAudioSource(
+      audioSources.add(
         AudioSource.uri(
-          Uri.parse(path),
+          Uri.parse(url),
           tag: MediaItem(
-            id: "1",
-            title: data[currentIndex]['name'],
-            artist: shihkName,
+            id: "$index",
+            title: myList[index]['name'],
+            artist: shikhName,
           ),
         ),
       );
+    }
 
-      if (pos != null) {
-        handleSeek(pos);
-      }
+    return ConcatenatingAudioSource(children: audioSources);
+  }
 
-      playr.positionStream.listen((p) {
-        position = p;
-        final buffer = playr.bufferedPosition;
-        const bufferMargin = Duration(seconds: 2);
-
-        if (position >= buffer - bufferMargin) {
-          isBufferingEnd = true;
-        } else {
-          isBufferingEnd = false;
-        }
-
-        notifyListeners();
-      });
-
-      playr.durationStream.listen((d) {
-        if (d != null) {
-          duration = d;
-          notifyListeners();
-        }
-      });
-
-      initPlayerListeners();
+  Future<void> initMusic({
+    required int startIndex,
+    required List myList,
+    required String shikhName,
+  }) async {
+    try {
+      await playr.setLoopMode(LoopMode.all);
+      ConcatenatingAudioSource playlist = await initializePlaylist(
+        myList,
+        shikhName,
+      );
+      await playr.setAudioSource(playlist, initialIndex: startIndex);
+      await playr.seek(Duration.zero, index: startIndex);
     } catch (e) {
-      print("Error loading audio: $e");
+      log(e.toString());
     }
   }
 
-  void initPlayerListeners() {
-    playr.playerStateStream.listen((state) {
-      if (state.processingState == ProcessingState.completed) {
-        if (isRepeat) {
-          playAudio(externalData, currentIndex, shihkName: externalShihkName);
-        } else {
-          nextMusic(externalData, externalShihkName!);
-        }
+  //=== Play Song
+
+  void playAudio(
+    List myList,
+    int index, {
+    required String shikhName,
+    double? pos,
+  }) async {
+    if (myList.isEmpty) return;
+    isNoInternet = false;
+    currentIndex = index;
+    title = myList[index]['name'];
+    externalData = myList;
+    externalShihkName = shikhName;
+    notifyListeners();
+
+    try {
+      await initMusic(startIndex: index, myList: myList, shikhName: shikhName);
+      initPlayerListeners();
+
+      // بدأ التشغيل بعد تحميل القائمة
+      if (pos != null) {
+        await handleSeek(pos);
+      }
+      await playr.play();
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  //=====================
+  void updatePosition() {
+    playr.positionStream.listen((p) {
+      position = p;
+      final buffer = playr.bufferedPosition;
+      const bufferMargin = Duration(seconds: 2);
+
+      if (position >= buffer - bufferMargin) {
+        isBufferingEnd = true;
+      } else {
+        isBufferingEnd = false;
       }
 
+      notifyListeners();
+    });
+
+    playr.durationStream.listen((d) {
+      if (d != null) {
+        duration = d;
+        notifyListeners();
+      }
+    });
+  }
+
+  void initPlayerListeners() {
+    // تحديث حالة المشغل
+    playr.playerStateStream.listen((state) {
       if (!state.playing || state.processingState == ProcessingState.idle) {
         _savePlaybackState(
           externalData,
@@ -143,17 +169,33 @@ class SoundPlayCtrl extends ChangeNotifier {
       }
     });
 
+    // تحديث المؤشر الحالي عند الانتقال التلقائي
+    playr.currentIndexStream.listen((index) {
+      if (index != null) {
+        currentIndex = index;
+        title = externalData[index]['name'];
+        notifyListeners();
+      }
+    });
+
+    // التكرار
+    playr.processingStateStream.listen((state) {
+      if (state == ProcessingState.completed) {
+        if (isRepeat) {
+          playr.setLoopMode(LoopMode.one);
+        } else {
+          playr.setLoopMode(LoopMode.off);
+        }
+      }
+    });
+
+    // الموضع والمدة
     playr.positionStream.listen((p) {
       position = p;
-
       final buffer = playr.bufferedPosition;
       const bufferMargin = Duration(seconds: 2);
-      if (position >= buffer - bufferMargin) {
-        isBufferingEnd = true;
-      } else {
-        isBufferingEnd = false;
-      }
 
+      isBufferingEnd = position >= buffer - bufferMargin;
       notifyListeners();
     });
 
@@ -187,11 +229,11 @@ class SoundPlayCtrl extends ChangeNotifier {
   void nextMusic(List data, String shikh) {
     if (currentIndex == data.length - 1) {
       currentIndex = 0;
-      playAudio(data, currentIndex);
+      playAudio(data, currentIndex, shikhName: shikh);
       notifyListeners();
     } else {
       currentIndex++;
-      playAudio(data, currentIndex, shihkName: shikh);
+      playAudio(data, currentIndex, shikhName: shikh);
       notifyListeners();
     }
   }
@@ -202,7 +244,7 @@ class SoundPlayCtrl extends ChangeNotifier {
       notifyListeners();
     }
     currentIndex--;
-    playAudio(data, currentIndex, shihkName: shikh);
+    playAudio(data, currentIndex, shikhName: shikh);
     notifyListeners();
   }
 

@@ -39,7 +39,7 @@ class Surah extends StatelessWidget {
                       soundPlay.playAudio(
                         model.surahs,
                         index,
-                        shihkName: model.shikhName,
+                        shikhName: model.shikhName,
                       );
                       soundPlay.handlePlayPause();
                       Navigator.of(context).push(

@@ -42,7 +42,7 @@ class Sira extends StatelessWidget {
                             soundPlay.playAudio(
                               model.siraData,
                               index,
-                              shihkName: "الدكتور راغب السرجاني",
+                              shikhName: "الدكتور راغب السرجاني",
                             );
                             soundPlay.handlePlayPause();
                             Navigator.of(context).push(

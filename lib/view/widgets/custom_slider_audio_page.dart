@@ -11,19 +11,22 @@ class CustomSliderAudioPage extends StatelessWidget {
     return Selector<SoundPlayCtrl, double>(
       selector: (p0, p1) => p1.position.inSeconds.toDouble(),
       builder: (context, value, child) {
-        return Slider(
-          min: 0.0,
-          max:
+        return Directionality(
+          textDirection: TextDirection.ltr,
+          child: Slider(
+            min: 0.0,
+            max:
+                model.duration.inSeconds > 0
+                    ? model.duration.inSeconds.toDouble()
+                    : 1.0,
+            value: value.clamp(
+              0.0,
               model.duration.inSeconds > 0
                   ? model.duration.inSeconds.toDouble()
                   : 1.0,
-          value: value.clamp(
-            0.0,
-            model.duration.inSeconds > 0
-                ? model.duration.inSeconds.toDouble()
-                : 1.0,
+            ),
+            onChanged: model.handleSeek,
           ),
-          onChanged: model.handleSeek,
         );
       },
     );

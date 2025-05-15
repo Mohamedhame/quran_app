@@ -18,23 +18,23 @@ class CustomPlayPausAudioPage extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        textDirection: TextDirection.rtl,
+        textDirection: TextDirection.ltr,
         children: [
           Row(
             textDirection: TextDirection.rtl,
             children: [
               InkWell(
                 onTap: () {
-                  model.nextMusic(data, shikh);
+                  model.decreaseSpeed();
                 },
-                child: Icon(Icons.skip_next, size: 32, color: Colors.white),
+                child: Icon(Icons.fast_rewind, size: 32, color: Colors.white),
               ),
               const SizedBox(width: 20),
               InkWell(
                 onTap: () {
-                  model.increaseSpeed();
+                  model.previousMusic(data, shikh);
                 },
-                child: Icon(Icons.fast_forward, size: 32, color: Colors.white),
+                child: Icon(Icons.skip_previous, size: 32, color: Colors.white),
               ),
             ],
           ),
@@ -66,16 +66,16 @@ class CustomPlayPausAudioPage extends StatelessWidget {
             children: [
               InkWell(
                 onTap: () {
-                  model.decreaseSpeed();
+                  model.nextMusic(data, shikh);
                 },
-                child: Icon(Icons.fast_rewind, size: 32, color: Colors.white),
+                child: Icon(Icons.skip_next, size: 32, color: Colors.white),
               ),
               const SizedBox(width: 20),
               InkWell(
                 onTap: () {
-                  model.previousMusic(data, shikh);
+                  model.increaseSpeed();
                 },
-                child: Icon(Icons.skip_previous, size: 32, color: Colors.white),
+                child: Icon(Icons.fast_forward, size: 32, color: Colors.white),
               ),
             ],
           ),
